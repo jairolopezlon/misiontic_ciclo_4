@@ -9,25 +9,28 @@ module.exports = (mongoose) => {
                 type: String,
                 required: true,
             },
-            specificObjectives: [
-                {
-                    _id: {
-                        type: mongoose.Schema.Types.ObjectId,
-                        index: true,
-                        required: true,
-                        auto: true,
+            specificObjectives: {
+                type: [
+                    {
+                        _id: {
+                            type: mongoose.ObjectId,
+                            index: true,
+                            required: true,
+                            auto: true,
+                        },
+                        title: {
+                            type: String,
+                            required: true,
+                        },
+                        accomplished: {
+                            type: Boolean,
+                            required: true,
+                            default: false,
+                        },
                     },
-                    title: {
-                        type: String,
-                        required: true,
-                    },
-                    accomplished: {
-                        type: Boolean,
-                        required: true,
-                        default: false,
-                    },
-                },
-            ],
+                ],
+                default: [],
+            },
             budget: {
                 type: Number,
                 required: true,
@@ -58,80 +61,79 @@ module.exports = (mongoose) => {
             },
             leaderInCharge: {
                 id: {
-                    type: mongoose.Schema.Types.ObjectId,
+                    type: mongoose.ObjectId,
                     required: true,
-                    ref: 'User',
                 },
                 fullName: {
                     type: String,
                     required: true,
                 },
-                documentId: {
-                    type: String,
-                    required: true,
-                },
             },
-            studentsInProject: [
-                {
-                    studentId: {
-                        type: mongoose.Schema.Types.ObjectId,
-                        required: true,
-                        unique: true,
+            studentsInProject: {
+                type: [
+                    {
+                        studentId: {
+                            type: mongoose.ObjectId,
+                            required: true,
+                        },
+                        fullName: {
+                            type: String,
+                            required: true,
+                        },
+                        inscriptionStatus: {
+                            type: String,
+                            enum: [null, 'aceptada', 'rechazada'],
+                            required: true,
+                            trim: true,
+                            default: null,
+                        },
+                        dateOfAdmission: {
+                            type: String,
+                            trim: true,
+                            default: null,
+                        },
+                        egressDate: {
+                            type: String,
+                            trim: true,
+                            default: null,
+                        },
                     },
-                    fullName: {
-                        type: String,
-                        required: true,
+                ],
+                default: undefined,
+            },
+            progress: {
+                type: [
+                    {
+                        _id: {
+                            type: mongoose.ObjectId,
+                            index: true,
+                            required: true,
+                            auto: true,
+                        },
+                        studentId: {
+                            type: mongoose.ObjectId,
+                            required: true,
+                        },
+                        studentFullName: {
+                            type: String,
+                            required: true,
+                        },
+                        description: {
+                            type: String,
+                            required: true,
+                        },
+                        createdDate: {
+                            type: String,
+                            trim: true,
+                            default: new Date(),
+                        },
+                        observation: {
+                            type: String,
+                        },
                     },
-                    inscriptionStatus: {
-                        type: String,
-                        enum: [null, 'aceptada', 'rechazada'],
-                        required: true,
-                        trim: true,
-                        default: null,
-                    },
-                    dateOfAdmission: {
-                        type: String,
-                        trim: true,
-                        default: null,
-                    },
-                    egressDate: {
-                        type: String,
-                        trim: true,
-                        default: null,
-                    },
-                },
-            ],
-            progress: [
-                {
-                    _id: {
-                        type: mongoose.Schema.Types.ObjectId,
-                        index: true,
-                        required: true,
-                        auto: true,
-                    },
-                    studentId: {
-                        type: mongoose.Schema.Types.ObjectId,
-                        required: true,
-                        ref: 'Users',
-                    },
-                    studentFullName: {
-                        type: String,
-                        required: true,
-                    },
-                    description: {
-                        type: String,
-                        required: true,
-                    },
-                    createdDate: {
-                        type: String,
-                        trim: true,
-                        default: new Date(),
-                    },
-                    observation: {
-                        type: String,
-                    },
-                },
-            ],
+                ],
+                default: undefined,
+            },
         },
         {
             timestamps: true,

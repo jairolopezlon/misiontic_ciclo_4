@@ -30,8 +30,9 @@ const typeDefs = gql`
     }
 
     type StudentsByProject {
-        projectId: ID!
-        students: [StudentInProject]!
+        _id: ID!
+        title: String
+        studentsInProject: [StudentInProject]!
     }
 
     type Progress {
@@ -46,13 +47,17 @@ const typeDefs = gql`
     type LeaderInCharge {
         id: ID!
         fullName: String!
-        documentId: String!
     }
 
     type Objective {
-        id: ID
+        id: ID!
         title: String
         accomplished: Boolean
+    }
+    type projectProgress {
+        id: ID
+        title: String!
+        progress: [Progress]!
     }
 
     type Project {
@@ -66,8 +71,8 @@ const typeDefs = gql`
         leaderInCharge: LeaderInCharge!
         status: String
         stage: String
-        studentsInProject: [StudentInProject]!
-        progress: [Progress]!
+        studentsInProject: [StudentInProject]
+        progress: [Progress]
     }
 
     # --- --- --- ---
@@ -80,7 +85,6 @@ const typeDefs = gql`
         email: String!
         password: String!
         role: String!
-        status: String!
         address: String
         phone: String
     }
@@ -93,10 +97,6 @@ const typeDefs = gql`
         phone: String
     }
 
-    input UpdateStatusUserInput {
-        status: String!
-    }
-
     input AuthenticateInput {
         email: String!
         password: String!
@@ -106,12 +106,6 @@ const typeDefs = gql`
         title: String!
     }
 
-    input LeaderInChargeInput {
-        id: ID!
-        fullName: String!
-        documentId: String!
-    }
-
     input ProjectInput {
         title: String!
         generalObjective: String
@@ -119,7 +113,6 @@ const typeDefs = gql`
         budget: Int!
         startDate: String!
         finishDate: String!
-        leaderInCharge: LeaderInChargeInput!
         studentsInProject: [StudentMemberInput]!
         progress: [ProgressInput]!
     }
@@ -152,12 +145,6 @@ const typeDefs = gql`
         generalObjective: String
     }
 
-    input UpdateSpecificObjectiveInput {
-        _id: ID!
-        title: String
-        accomplished: Boolean
-    }
-
     # --- START - PARA REVISAR ---
     input ActivateUserInput {
         actived: Boolean!
@@ -173,20 +160,19 @@ const typeDefs = gql`
         authenticateUser(input: AuthenticateInput): Token
         registerUser(input: UserInput): User
         updateUser(id: ID!, input: UpdateUserInput): User
-        activateUser(id: ID!, input: UpdateStatusUserInput): User
+        activateUser(id: ID!, status: String!): User
 
         # --- Proyectos ---
         registerProject(input: ProjectInput): Project
         updateProjectData(projectId: ID!, input: UpdateProjectDataInput): Project
         registerProgressInProject(projectId: ID!, description: String!): Project
-
-        # --- PENDIENTES PROBAR ---
+        updateProjectStatus(projectId: ID!, status: String!): Project
+        finishProject(projectId: ID!): Project
+        updateSpecificObjective(projectId: ID!, objectiveId: ID!, title: String!): Project
+        setStatusSpecificObjective(projectId: ID!, objectiveId: ID!, accomplished: Boolean!): Project
+        updateInscriptionStatus(projectId: ID!, studentId: ID!, inscriptionStatus: String!): StudentsByProject
         updateProgressObservation(projectId: ID!, progressId: ID!, observation: String!): Project
         updateProgressDescription(projectId: ID!, progressId: ID!, description: String!): Project
-
-        # --- PENDIENTES CREAR ---
-        updateSpecificObjective(projectId: ID!, objectiveId: ID!, input: UpdateSpecificObjectiveInput): Project
-        updateInscriptionStatus(projectId: ID!, studentId: ID!, inscriptionStatus: String!): Project
         registerInProject(projectId: ID!): Project
     }
 
@@ -196,17 +182,18 @@ const typeDefs = gql`
         # Usuarios
         getUsers: [User]
         getUser(id: ID!): User
+        getStudents: [User]
 
         # Proyectos
         getProjects: [Project]
-        getProject(id: ID!): Project
-        getProjectsByLeader: [Project]
-        getProjectsActives: [Project]
-        myProjects: [Project]
+        getProject(proyectId: ID!): Project
+        getProjectsByLeader(leaderId: ID): [Project]
+        getActivesProjects: [Project]
+        getInscriptions: [StudentsByProject]
+        getProgressByProject(projectId: ID): projectProgress
 
         # --- PENDIENTES ---
         getProjectByLeader(projectId: ID): Project
-        listInscriptions(leaderId: ID!): StudentsByProject
     }
 `;
 
